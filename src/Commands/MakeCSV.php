@@ -38,9 +38,9 @@ class MakeCSV extends Command
         }
         $retval = $lingo->scanLangDir(app_path($directory));
         if (!empty($retval)) {
-            $this->info('CSV\'s created.')
+            $this->info('CSV\'s created.');
         } else {
-            $this->info('CSV\'s creation failed.')
+            $this->info('CSV\'s creation failed.');
         }
     }
 }
