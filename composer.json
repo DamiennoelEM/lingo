@@ -1,5 +1,5 @@
 {
-    "name": "chipolo/Lingo",
+    "name": "chipolo/lingo",
     "description": "Helps with transfering files between lingohub and laravel.",
     "license": "MIT",
     "keywords": ["chipolo", "lingohub"],
