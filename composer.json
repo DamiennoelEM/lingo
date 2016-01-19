@@ -1,0 +1,21 @@
+{
+    "name": "chipolo/Lingo",
+    "description": "Helps with transfering files between lingohub and laravel.",
+    "license": "MIT",
+    "keywords": ["chipolo", "lingohub"],
+    "authors": [
+        {
+            "name": "Marko Zagar",
+            "email": "marko.zagar@chipolo.net"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "4.0.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Chipolo\\Lingo\\": "src"
+        }
+    }
+}
