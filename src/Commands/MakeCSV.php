@@ -63,10 +63,11 @@ class MakeCSV extends Command
             $this->info('No projects found on LingoHub. Please create some. Exiting... ');
             exit();
         }
+
         $projectIndex = $this->choice('Please select project on LingoHub for current project.', array_values($projects), 0);
         $lingo->setProject($projectIndex);
 
-        $retval = $lingo->startPushFiles($directory);
+        $retval = $lingo->startPushFiles();
 
         $valid = true;
         foreach ($retval as $value) {
