@@ -12,7 +12,7 @@ class MakeCSV extends Command
      *
      * @var string
      */
-    protected $signature = 'lang:makeCSV';
+    protected $signature = 'lingohub:pushFiles';
 
     /**
      * The console command description.
@@ -28,19 +28,31 @@ class MakeCSV extends Command
      */
     public function handle()
     {
-        $apiKey     = '632778495ac92a60a6f8c44c0c702ea677ef87d5de58b6b47d4ce03c2623d20e';
-        $user       = 'marko-zagar';
+        $apiKey     = config('lingohub.apiKey', '');
+        $user       = config('lingohub.username', '');
+
+        if ($apiKey == '') {
+            $apiKey = $this->ask('Can\'t find api key in lingohub config, please insert it now.');
+        }
+
+        if ($user == '') {
+            $apiKey = $this->ask('Can\'t find username in lingohub config, please insert it now.');
+        }
+
         $lingo = new Lingo($apiKey, $user);
         $path = '../resources/lang/';
-        $directory = $this->ask('Where do you keep you lang files ? (default is: '.$path.', leave empty for default)');
-        if (trim($directory) == "") {
+
+        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write default to keep)');
+        if (trim($directory) == "default") {
             $directory = $path;
         }
+
         $retval = $lingo->scanLangDir(app_path($directory));
         if (!empty($retval)) {
             $this->info('CSV\'s created.');
         } else {
             $this->info('CSV\'s creation failed.');
         }
+        
     }
 }
