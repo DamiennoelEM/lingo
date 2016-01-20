@@ -59,14 +59,13 @@ class MakeCSV extends Command
         }
         
         $projects = $lingo->projects();
-        var_dump($projects);
         if (empty($projects)) {
             $this->info('No projects found on LingoHub. Please create some. Exiting... ');
             exit();
         }
         $projectIndex = $this->choice('Please select project on LingoHub for current project.', array_values($projects), 0);
         $lingo->setProject($projectIndex);
-        var_dump($lingo->currentProject);die;
+
         $retval = $lingo->startPushFiles($directory);
 
         $valid = true;

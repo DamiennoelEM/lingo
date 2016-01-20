@@ -70,6 +70,7 @@ class Lingo
 	public function setProject($index)
 	{
 		if (array_key_exists($index, $this->projects)) {
+			
 			$this->currentProject 		= $this->prepareProject($this->projects[$index]);
 			$this->setProjectName($this->currentProject['title']);
 
@@ -121,7 +122,7 @@ class Lingo
 
 	public function addLanguage($lang)
 	{
-		array_push($this->lang, $lang)
+		array_push($this->lang, $lang);
 		$this->lang = array_unique($this->lang);
 		return $this->lang;
 	}
