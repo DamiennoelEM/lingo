@@ -80,9 +80,9 @@ class Lingo
 	{
 		foreach ($this->projects as $project) {
 			if ($project['title'] == $addProject) {
-				dump('inside');
-				$this->currentProject 		= $this->prepareProject($this->projects[$index]);
-				$this->setProjectName($this->currentProject['title']);
+
+				$this->currentProject 		= $this->prepareProject($project);
+				$this->setProjectName($project['title']);
 
 				return true;
 			}
