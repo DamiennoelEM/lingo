@@ -79,7 +79,7 @@ class Lingo
 	public function setProject($addProject)
 	{
 		foreach ($this->projects as $project) {
-			if ($project == $addProject) {
+			if ($project['title'] == $addProject) {
 				dump('inside');
 				$this->currentProject 		= $this->prepareProject($this->projects[$index]);
 				$this->setProjectName($this->currentProject['title']);
