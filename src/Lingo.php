@@ -78,6 +78,7 @@ class Lingo
 
 	public function setProject($index)
 	{
+		dump($index);
 		dump('outside');
 		if (array_key_exists($index, $this->projects)) {
 			dump('inside');
