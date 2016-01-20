@@ -76,19 +76,18 @@ class Lingo
 		return $retval;
 	}
 
-	public function setProject($index)
+	public function setProject($addProject)
 	{
-		dump($index);
-		dump('outside');
-		if (array_key_exists($index, $this->projects)) {
-			dump('inside');
-			$this->currentProject 		= $this->prepareProject($this->projects[$index]);
-			$this->setProjectName($this->currentProject['title']);
+		foreach ($this->projects as $project) {
+			if ($project == $addProject) {
+				dump('inside');
+				$this->currentProject 		= $this->prepareProject($this->projects[$index]);
+				$this->setProjectName($this->currentProject['title']);
 
-			return true;
-		} else {
-			return false;
+				return true;
+			}
 		}
+		return false;
 	}
 	
 	private function setProjectName($name)
