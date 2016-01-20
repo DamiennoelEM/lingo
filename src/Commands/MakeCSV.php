@@ -40,7 +40,7 @@ class MakeCSV extends Command
         }
 
         $lingo = new Lingo($apiKey, $user);
-        $path = '../resources/lang/';
+        $path = 'resources/lang/';
 
         $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "default" to keep)');
         if (trim($directory) == "default") {
@@ -63,10 +63,7 @@ class MakeCSV extends Command
             $this->info('No projects found on LingoHub. Please create some. Exiting... ');
             exit();
         }
-        foreach ($projects as $key => $value) {
-            $this->info($key. ': '.$value['title']);
-        }
-        $projectIndex = $this->choice('Please select project on LingoHub for current project.', array_keys($projects), 0);
+        $projectIndex = $this->choice('Please select project on LingoHub for current project.', array_values($projects), 0);
         $lingo->setProject($projectIndex);
 
         $retval = $lingo->startPushFiles($directory);
