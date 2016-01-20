@@ -79,7 +79,7 @@ class Lingo
 	public function setProject($index)
 	{
 		if (array_key_exists($index, $this->projects)) {
-			
+			dump('inside');
 			$this->currentProject 		= $this->prepareProject($this->projects[$index]);
 			$this->setProjectName($this->currentProject['title']);
 
