@@ -53,7 +53,7 @@ class MakeCSV extends Command
             $stop = 'quit';
             $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
             while (true) {
-                $lang = $this->ask('Add')
+                $lang = $this->ask('Add');
                 if ($lang != $stop) {
                     $lingo->addLanguage(trim($lang));
                 } else {
