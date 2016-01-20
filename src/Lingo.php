@@ -62,7 +62,7 @@ class Lingo
 		$request = $this->client->get($this->generateBasicLink('projects.json'));
         $response = $request->send();
 
-        $this->projects = array_key_exists('members', $response->json()) ? $response->json()['members'] : [];
+        $this->projects = $response->json()['members'];
 
         return $this->projects;
 	}
@@ -121,7 +121,7 @@ class Lingo
 
 	public function addLanguage($lang)
 	{
-		array_push($this->lang, $lang);
+		array_push($this->lang, $lang)
 		$this->lang = array_unique($this->lang);
 		return $this->lang;
 	}
