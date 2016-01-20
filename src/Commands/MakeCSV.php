@@ -69,7 +69,7 @@ class MakeCSV extends Command
         $lingo->setProject($projectIndex);
 
         $retval = $lingo->startPushFiles();
-
+        var_dump($retval);die;
         $valid = true;
         foreach ($retval as $value) {
             $status = $value['status']['status'];
