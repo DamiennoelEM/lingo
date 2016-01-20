@@ -88,6 +88,11 @@ class Lingo
 			return false;
 		}
 	}
+	
+	private function setProjectName($name)
+	{
+		return $this->currentProjectName = strtolower($name);
+	}
 
 	private function prepareProject($project)
 	{
@@ -101,11 +106,6 @@ class Lingo
 		} else {
 			return $project;
 		}
-	}
-
-	private function setProjectName($name)
-	{
-		return $this->currentProjectName = strtolower($name);
 	}
 
 	public function scanLangDir($root)

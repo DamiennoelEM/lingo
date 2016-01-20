@@ -52,7 +52,7 @@ class MakeCSV extends Command
         if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
             $stop = 'quit';
             $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
-            while ($lang = $this->ask('Add: ') != $stop) {
+            while ($lang = $this->ask('Add') != $stop) {
                 $lingo->addLanguage(trim($lang));
             }
             $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
@@ -67,8 +67,9 @@ class MakeCSV extends Command
 
         $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
         $lingo->setProject($projectIndex);
-
+        dd($lingo->currentProject);
         $retval = $lingo->startPushFiles();
+
         var_dump($retval);die;
         $valid = true;
         foreach ($retval as $value) {
