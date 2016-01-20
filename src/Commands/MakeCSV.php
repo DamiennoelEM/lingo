@@ -41,7 +41,7 @@ class MakeCSV extends Command
 
         $lingo = new Lingo($apiKey, $user);
         $path = 'resources/lang/';
-
+        dump([$apiKey, $user]);
         $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "default" to keep)');
         if (trim($directory) == "default") {
             $directory = $path;
@@ -59,6 +59,8 @@ class MakeCSV extends Command
         }
         
         $projects = $lingo->projects();
+   
+        dd($projects);
         if (empty($projects)) {
             $this->info('No projects found on LingoHub. Please create some. Exiting... ');
             exit();
