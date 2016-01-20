@@ -67,6 +67,15 @@ class Lingo
         return $this->projects;
 	}
 
+	public function getProjectsNames()
+	{
+		$retval = [];
+		foreach ($this->projects as $project) {
+			array_push($retval, $project['title']);
+		}
+		return $retval;
+	}
+
 	public function setProject($index)
 	{
 		if (array_key_exists($index, $this->projects)) {
