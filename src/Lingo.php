@@ -16,7 +16,7 @@ class Lingo
 
 	protected 	$lingoUser;
 
-	private 	$projects;
+	public		$projects;
 	public 		$currentProject;
 	public 		$currentProjectName;
 
