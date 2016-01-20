@@ -52,9 +52,13 @@ class MakeCSV extends Command
         if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
             $stop = 'quit';
             $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
-            while ($lang = $this->ask('Add') != $stop) {
-                dump($lang);
-                $lingo->addLanguage(trim($lang));
+            while (true) {
+                $lang = $this->ask('Add')
+                if ($lang != $stop) {
+                    $lingo->addLanguage(trim($lang));
+                } else {
+                    break;
+                }  
             }
             $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
         }
