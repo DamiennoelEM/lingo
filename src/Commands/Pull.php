@@ -64,7 +64,7 @@ class Pull extends Command
         $lingo->setResource($projectLocale);
 
       
-        $retval = $lingo->startPushFiles();
+        $retval = $lingo->pullFiles();
 
         $valid = true;
         foreach ($retval as $value) {

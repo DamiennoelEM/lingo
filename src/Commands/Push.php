@@ -73,7 +73,7 @@ class Push extends Command
         $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
         $lingo->setProject($projectIndex);
 
-        $retval = $lingo->startPushFiles();
+        $retval = $lingo->pushFiles();
 
         $valid = true;
         foreach ($retval as $value) {
