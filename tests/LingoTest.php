@@ -68,4 +68,17 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 		var_dump($lingo->lang);
 	}
 
+	public function testGetFiles()
+	{
+		$lingo = new Lingo($this->apiKey, $this->user);
+		$lingo->scanLangDir('resources/lang/');
+		$lingo->getProjects();
+		$lingo->setProject(0);
+
+		$lingo->getResources();
+		$lingo->getLocalePullNames();
+		$lingo->setFilesToExport(0);
+
+        var_dump($lingo->pullFiles);
+	}
 }
