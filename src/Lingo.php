@@ -24,7 +24,7 @@ class Lingo
 	public 		$workingDir;
 
 	public 		$files = [];
-	public 		$pullFiles = [];
+	public 		$pullDataFiles = [];
 	public 		$lang = [];
 	public 		$rows = ['Title'];
 
@@ -121,8 +121,8 @@ class Lingo
 		$ignore = ['.', '..'];
 		foreach ($dirs as $dir) {
 			if (!in_array($dir, $ignore)) {
-				if (is_dir($root.$dir)) {		
-					array_push($this->dirs, $root.$dir);
+				if (is_dir($this->workingDir.$dir)) {		
+					array_push($this->dirs, $this->workingDir.$dir);
 					array_push($this->lang, $dir);
 				}
 			}
@@ -130,10 +130,10 @@ class Lingo
 		return $this->dirs;
 	}
 
-	public function startPushFiles()
+	public function pushFiles()
 	{
 		$this->processLangDir();
-		return $this->pushFiles();
+		return $this->startPushFiles();
 	}
 
 	public function addLanguage($lang)
@@ -221,7 +221,7 @@ class Lingo
         return $retval;
     }
 
-    private function pushFiles()
+    private function startPushFiles()
     {
     	$retval = [];
     	foreach ($this->files as $lang => $type) {
@@ -279,12 +279,13 @@ class Lingo
        		$this->localeResources[$resource['project_locale']][] = $resource;
        	}
 
+       	$this->localePullNames = $this->getLocalePullNames();
        	return $this->localeResources;
 	}
 
 	public function getLocalePullNames()
 	{
-		return $this->localePullNames = array_merge(array_keys($this->localeResources), ['all']);
+		return array_merge(array_keys($this->localeResources), ['all']);
 	}
 
 	public function setResource($resourceIndex)
@@ -296,16 +297,16 @@ class Lingo
 		}
 
 		foreach ($resource as $item) {
-			array_push($this->pullFiles, $this->prepareResource($item));
+			array_push($this->pullDataFiles, $this->prepareResource($item));
 		}
 
-		return $this->pullFiles;
+		return $this->pullDataFiles;
 	}
 
-	public function fetchFiles()
+	public function pullFiles()
  	{
  		$retval = [];
- 		foreach ($this->pullFiles as $file) {
+ 		foreach ($this->pullDataFiles as $file) {
  			array_push($retval, $this->fetchFile($file['links']['self']['href'], $file['name']));
  		}
 
@@ -324,8 +325,8 @@ class Lingo
         array_push($partsFile, $ext);
 		$csvFile 		= implode('.', $partsFile);
 
-        $csvDir			= $this->workingDir.'/pulled-csv/'.$folder.'/';
-        @mkdir($csvDir);
+        $csvDir			= $this->workingDir.'pulled-csv/'.$folder.'/';
+        @mkdir($csvDir, 0777, true);
         $csvFilename 	= $csvDir.$csvFile;
         
         $fileCreate = file_put_contents($csvFilename, $remoteFile);
@@ -333,7 +334,7 @@ class Lingo
         if ($fileCreate === false) {
 	        return [
 	        	'file' 		=> $csvFilename,
-	        	'success'	=> false;	
+	        	'success'	=> false
 	        ];
 	    }
 
@@ -343,18 +344,18 @@ class Lingo
     public function createFromCsv($csvFilename, $csvDir, $file)
     {
         $retval = [];
-        $reader = Reader::createFromPath($scvFilename);
+        $reader = Reader::createFromPath($csvFilename);
         foreach ($reader->fetch() as $key=>$row) {
             if ($key != 0) {
-                array_set($retval, $row[0], $row[2]);
+                Arr::set($retval, $row[0], $row[2]);
             }
         }
-        $filename = $cvsDir.$file'.php';
+        $filename = $csvDir.$file.'.php';
         $fileCreate = file_put_contents($filename, "<?php\nreturn " . var_export($retval, true) . ';');
 
         return [
         	'file' 		=> $filename,
-        	'success'	=> $fileCreate !== false ? true : false;	
+        	'success'	=> $fileCreate !== false ? true : false	
         ];
     }
 }
