@@ -21,6 +21,7 @@ class Lingo
 	public 		$localePullNames;
 	public 		$currentProject;
 	public 		$currentProjectName;
+	public 		$workingDir;
 
 	public 		$files = [];
 	public 		$pullFiles = [];
@@ -50,6 +51,16 @@ class Lingo
 	private function generateBasicLink($call)
 	{
 		return $this->apiLink.$call.'?auth_token='.$this->apiKey;
+	}
+
+	private function generateResourceLink($link)
+	{
+		return $link.'?auth_token='.$this->apiKey;
+	}
+
+	public function setWorkingDir($directory)
+	{
+		return $this->workingDir = $directory;
 	}
 
 	public function getProjects()
@@ -104,9 +115,9 @@ class Lingo
 		}
 	}
 
-	public function scanLangDir($root)
+	public function scanLangDir()
 	{
-		$dirs = scandir($root);
+		$dirs = scandir($this->workingDir);
 		$ignore = ['.', '..'];
 		foreach ($dirs as $dir) {
 			if (!in_array($dir, $ignore)) {
@@ -253,6 +264,7 @@ class Lingo
         substr($result, 0, $header_size);
         $body = substr($result, $header_size);
         curl_close($ch);
+
         return json_decode($body, true);
     }
 
@@ -282,33 +294,67 @@ class Lingo
 		} else {
 			$resource = $this->resources;
 		}
+
 		foreach ($resource as $item) {
 			array_push($this->pullFiles, $this->prepareResource($item));
 		}
-		
+
 		return $this->pullFiles;
 	}
 
-    public function getFetchFile()
-    {
-        $link = 'https://api.lingohub.com/v1/marko-zagar/projects/testproject/resources/file4.en.csv?auth_token='. $this->token;
+	public function fetchFiles()
+ 	{
+ 		$retval = []
+ 		foreach ($this->pullFiles as $file) {
+ 			array_push($retval, $this->fetchFile($file['links']['self']['href'], $file['name']));
+ 		}
 
-        $p = file_get_contents($this->generateProjectsLink('resources.json'));
-        $file = 'test_back.csv';
-        file_put_contents($file, $p);
-        $s = $this->getParseFromFile($file);
-        dd($s);
+ 		return $retval;
+ 	}
+
+    private function fetchFile($url, $name)
+    {
+        $remoteFile = file_get_contents($this->generateResourceLink($url));
+
+        $partsFile = explode('.', $name);
+        $ext = array_pop($partsFile);
+        $folder = array_pop($partsFile);
+        $file = implode('.', $partsFile);
+
+        array_push($partsFile, $ext);
+		$csvFile 		= implode('.', $partsFile);
+
+        $csvDir			= $this->workingDir.'/pulled-csv/'.$folder.'/';
+        @mkdir($csvDir);
+        $csvFilename 	= $csvDir.$csvFile;
+        
+        $fileCreate = file_put_contents($csvFilename, $remoteFile);
+
+        if ($fileCreate === false) {
+	        return [
+	        	'file' 		=> $csvFilename,
+	        	'success'	=> false;	
+	        ];
+	    }
+
+        return  $this->createFromCsv($csvFilename, $csvDir, $file);
     }
 
-    public function getParseFromFile()
+    public function createFromCsv($csvFilename, $csvDir, $file)
     {
         $retval = [];
-        $reader = Reader::createFromPath('test_back.csv');
+        $reader = Reader::createFromPath($scvFilename);
         foreach ($reader->fetch() as $key=>$row) {
             if ($key != 0) {
                 array_set($retval, $row[0], $row[2]);
             }
         }
-        file_put_contents("ret_site.php", "<?php\nreturn " . var_export($retval, true) . ';');
+        $filename = $cvsDir.$file'.php';
+        $fileCreate = file_put_contents($filename, "<?php\nreturn " . var_export($retval, true) . ';');
+
+        return [
+        	'file' 		=> $filename,
+        	'success'	=> $fileCreate !== false ? true : false;	
+        ];
     }
 }

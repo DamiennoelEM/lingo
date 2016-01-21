@@ -46,6 +46,7 @@ class Pull extends Command
         if (trim($directory) == "default") {
             $directory = $path;
         }
+        $lingo->setWorkingDir($directory);
 
         $projects = $lingo->getProjects();
    
@@ -62,8 +63,22 @@ class Pull extends Command
         $projectLocale = $this->choice('Please select locale you wish to export.', $lingo->getLocalePullNames());
         $lingo->setResource($projectLocale);
 
-        dd($lingo->pullFiles);
-        
+      
+        $retval = $lingo->startPushFiles();
+
+        $valid = true;
+        foreach ($retval as $value) {
+            $status = $value['success'];
+            if (!$status) {
+                $valid = false;
+            }
+            $this->info('Creating - '. $value['file'].': '.($status ? 'success' : 'failed').'.');
+        }
+        if (!$valid) {
+            $this->info('Failed to create some files.');
+        } else {
+            $this->info('All files created successfully.');
+        }
         
     }
 }
