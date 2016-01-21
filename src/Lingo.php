@@ -49,7 +49,7 @@ class Lingo
 		return $this->apiLink.$call.'?auth_token='.$this->apiKey;
 	}
 
-	public function resources()
+	public function getResources()
 	{
 		$request = $this->client->get($this->generateProjectsLink('resources.json'));
         $response = $request->send();
@@ -57,12 +57,12 @@ class Lingo
        	return  $response->json();
 	}
 
-	public function projects()
+	public function getProjects()
 	{
 		$request = $this->client->get($this->generateBasicLink('projects.json'));
         $response = $request->send();
 
-        $this->projects = $response->json()['members'];
+        $this->projects = array_key_exists('members', $response->json) ? $response->json()['members'] : [];
 
         return $this->projects;
 	}

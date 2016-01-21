@@ -63,7 +63,7 @@ class Push extends Command
             $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
         }
         
-        $projects = $lingo->projects();
+        $projects = $lingo->getProjects();
    
         if (empty($projects)) {
             $this->info('No projects found on LingoHub. Please create some. Exiting... ');
