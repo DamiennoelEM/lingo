@@ -60,7 +60,7 @@ class Pull extends Command
         $resources = $lingo->getResources();
         
         $projectLocale = $this->choice('Please select locale you wish to export.', $lingo->getLocalePullNames());
-        $lingo->setFilesToExport($projectLocale);
+        $lingo->setResource($projectLocale);
 
         dd($lingo->pullFiles);
         

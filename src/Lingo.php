@@ -76,7 +76,7 @@ class Lingo
 		foreach ($this->projects as $project) {
 			if ($project['title'] == $addProject) {
 
-				$this->currentProject 		= $this->prepareProject($project);
+				$this->currentProject 		= $this->prepareResource($project);
 				$this->setProjectName($project['title']);
 
 				return true;
@@ -90,7 +90,7 @@ class Lingo
 		return $this->currentProjectName = strtolower($name);
 	}
 
-	private function prepareProject($project)
+	private function prepareResource($project)
 	{
 		if (array_key_exists('links', $project)) {
 			$retval = [];
@@ -275,14 +275,17 @@ class Lingo
 		return $this->localePullNames = array_merge(array_keys($this->localeResources), ['all']);
 	}
 
-	public function setFilesToExport($resourceIndex)
+	public function setResource($resourceIndex)
 	{
 		if (array_key_exists($resourceIndex,  $this->localeResources)) {
-			$this->pullFiles = $this->localeResources[$resourceIndex];
+			$resource = $this->localeResources[$resourceIndex];
 		} else {
-			$this->pullFiles = $this->resources;
+			$resource = $this->resources;
 		}
-
+		foreach ($resource as $item) {
+			array_push($this->pullFiles, $this->prepareResource($item));
+		}
+		
 		return $this->pullFiles;
 	}
 

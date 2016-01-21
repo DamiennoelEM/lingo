@@ -77,7 +77,7 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 
 		$lingo->getResources();
 		$lingo->getLocalePullNames();
-		$lingo->setFilesToExport(0);
+		$lingo->setResource(0);
 
         var_dump($lingo->pullFiles);
 	}
