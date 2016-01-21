@@ -277,6 +277,8 @@ class Lingo
 
 	public function setFilesToExport($resourceIndex)
 	{
+		var_dump($this->localePullNames[$resourceIndex]);
+		var_dump($this->localeResources);die;
 		if (array_key_exists($this->localePullNames[$resourceIndex],  $this->localeResources)) {
 			$this->pullFiles = $this->localeResources[$this->localePullNames[$resourceIndex]];
 		} else {
