@@ -15,65 +15,53 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 	public function testResources()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
-		$projects = $lingo->getProjects();
+		
+		$lingo->getProjects();
 		$lingo->setProject(0);
-		$response = $lingo->getResources();
-		var_dump($response);
+
+		$retval = $lingo->getResources();
+		var_dump($retval);
 	}
 
 	public function testProjects()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
 
-		$projects = $lingo->projects();
+		$$lingo->getProjects();
 		$lingo->setProject(0);
 
 		$response = $lingo->projects();
 		var_dump($response);
 	}
 
-	public function testSetProjects()
+	public function testSetProject()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
 		$projects = $lingo->projects();
 		$lingo->setProject(0);
-		$this->assertEquals(strtolower($lingo->currentProject['title']), 'testproject');
+
+		var_dump($lingo->currentProject);
 	}
 
-	public function testMakeCvs()
+	public function testPushFiles()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
-		$p = $lingo->scanLangDir('resources/lang/');
-		var_dump($p);
-	}
 
-	public function testSendFile()
-	{
-		$lingo = new Lingo($this->apiKey, $this->user);
-		$lingo->scanLangDir('resources/lang/');
-		$lingo->projects();
+		$lingo->setWorkingDir('resources/lang/');
+		$lingo->scanLangDir();
+
+		$lingo->getProjects();
 		$lingo->setProject(0);
 
 		$retval = $lingo->pushFiles();
-		//$retval = $lingo->startPushFiles('resources/lang/');
 		var_dump($retval);
 	}
 
-	public function testAddLang()
+	public function testPullFiles()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
-		$lingo->scanLangDir('resources/lang/');
-		var_dump($lingo->lang);
-		$lingo->addLanguage('it');
-		var_dump($lingo->lang);
-	}
 
-	public function testGetFiles()
-	{
-		$lingo = new Lingo($this->apiKey, $this->user);
-		$directory = 'resources/lang/';
-		$lingo->setWorkingDir($directory);
-		
+		$lingo->setWorkingDir('resources/lang/');
 		$lingo->scanLangDir();
 
 		$lingo->getProjects();

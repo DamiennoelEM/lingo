@@ -41,9 +41,10 @@ class Pull extends Command
 
         $lingo = new Lingo($apiKey, $user);
         $path = 'resources/lang/';
+        $default = 'd';
 
-        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "default" to keep)');
-        if (trim($directory) == "default") {
+        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        if (trim($directory) == $default) {
             $directory = $path;
         }
         $lingo->setWorkingDir($directory);

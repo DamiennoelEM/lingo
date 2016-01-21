@@ -41,16 +41,17 @@ class Push extends Command
 
         $lingo = new Lingo($apiKey, $user);
         $path = 'resources/lang/';
+        $default = 'd';
 
-        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "default" to keep)');
-        if (trim($directory) == "default") {
+        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        if (trim($directory) == $default) {
             $directory = $path;
         }
         $lingo->setWorkingDir($directory);
         $lingo->scanLangDir();
 
         if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
-            $stop = 'quit';
+            $stop = 'q';
             $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
             while (true) {
                 $lang = $this->ask('Add');
