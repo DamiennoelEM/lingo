@@ -304,7 +304,7 @@ class Lingo
 
 	public function fetchFiles()
  	{
- 		$retval = []
+ 		$retval = [];
  		foreach ($this->pullFiles as $file) {
  			array_push($retval, $this->fetchFile($file['links']['self']['href'], $file['name']));
  		}
