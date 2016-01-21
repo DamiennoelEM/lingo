@@ -58,6 +58,13 @@ class Lingo
 		return $link.'?auth_token='.$this->apiKey;
 	}
 
+	private function removeFile($file)
+	{
+		if (file_exists($file)) {
+			unlink($file);
+		}
+	}
+
 	public function setWorkingDir($directory, $scan = true)
 	{
 		$this->workingDir = $directory;
@@ -233,11 +240,15 @@ class Lingo
     	foreach ($this->files as $lang => $type) {
     		if (array_key_exists('csv', $type)) {
     			foreach ($type['csv'] as $file) {
+    				$push = $this->pushFile($file, $lang);
     				$status = [
     					'file' 		=> $file,
-    					'status'	=> $this->pushFile($file, $lang)
+    					'status'	=> $push
     				];
     				array_push($retval, $status);
+    				if ($push['status'] == 'Success') {
+    					$this->removeFile($file);
+    				}
     			}
     		}
     	}
