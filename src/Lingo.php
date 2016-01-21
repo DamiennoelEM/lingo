@@ -260,4 +260,27 @@ class Lingo
         curl_close($ch);
         return json_decode($body, true);
     }
+
+    public function getFetchFile()
+    {
+        $link = 'https://api.lingohub.com/v1/marko-zagar/projects/testproject/resources/file4.en.csv?auth_token='. $this->token;
+
+        $p = file_get_contents($link);
+        $file = 'test_back.csv';
+        file_put_contents($file, $p);
+        $s = $this->getParseFromFile($file);
+        dd($s);
+    }
+
+    public function getParseFromFile()
+    {
+        $retval = [];
+        $reader = Reader::createFromPath('test_back.csv');
+        foreach ($reader->fetch() as $key=>$row) {
+            if ($key != 0) {
+                array_set($retval, $row[0], $row[2]);
+            }
+        }
+        file_put_contents("ret_site.php", "<?php\nreturn " . var_export($retval, true) . ';');
+    }
 }
