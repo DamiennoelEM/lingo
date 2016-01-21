@@ -11,16 +11,19 @@ class Lingo
 {
 	protected 	$apiKey;
 	private 	$apiLink = 'https://api.lingohub.com/v1/';
+	protected 	$lingoUser;
 
 	private 	$client;
 
-	protected 	$lingoUser;
-
 	public		$projects;
+	public 		$resources;
+	public 		$localeResources;
+	public 		$localePullNames;
 	public 		$currentProject;
 	public 		$currentProjectName;
 
 	public 		$files = [];
+	public 		$pullFiles = [];
 	public 		$lang = [];
 	public 		$rows = ['Title'];
 
@@ -49,20 +52,12 @@ class Lingo
 		return $this->apiLink.$call.'?auth_token='.$this->apiKey;
 	}
 
-	public function getResources()
-	{
-		$request = $this->client->get($this->generateProjectsLink('resources.json'));
-        $response = $request->send();
-
-       	return  $response->json();
-	}
-
 	public function getProjects()
 	{
 		$request = $this->client->get($this->generateBasicLink('projects.json'));
         $response = $request->send();
 
-        $this->projects = array_key_exists('members', $response->json) ? $response->json()['members'] : [];
+        $this->projects = array_key_exists('members', $response->json()) ? $response->json()['members'] : [];
 
         return $this->projects;
 	}
@@ -260,6 +255,36 @@ class Lingo
         curl_close($ch);
         return json_decode($body, true);
     }
+
+    public function getResources()
+	{
+		$request = $this->client->get($this->generateProjectsLink('resources.json'));
+        $response = $request->send();
+
+       	$this->resources = array_key_exists('members', $response->json()) ? $response->json()['members'] : [];
+
+       	foreach ($this->resources as $resource) {
+       		$this->localeResources[$resource['project_locale']][] = $resource;
+       	}
+
+       	return $this->localeResources;
+	}
+
+	public function getLocalePullNames()
+	{
+		$this->localePullNames = array_combine(array_keys($this->localeResources), ['all']);
+	}
+
+	public function setFilesToExport($resourceIndex)
+	{
+		if (array_key_exists($this->localePullNames($resourceIndex),  $this->localeResources) {
+			$this->pullFiles = $this->localeResources[$this->localePullNames($resourceIndex)];
+		} else {
+			$this->pullFiles = $this->resources;
+		}
+
+		return $this->pullFiles;
+	}
 
     public function getFetchFile()
     {

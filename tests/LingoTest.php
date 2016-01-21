@@ -15,9 +15,9 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 	public function testResources()
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
-		$projects = $lingo->projects();
+		$projects = $lingo->getProjects();
 		$lingo->setProject(0);
-		$response = $lingo->resources();
+		$response = $lingo->getResources();
 		var_dump($response);
 	}
 
