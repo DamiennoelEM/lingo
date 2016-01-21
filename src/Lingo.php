@@ -189,6 +189,7 @@ class Lingo
         array_push($partsFile, 'csv');
         $csvFile 		= implode('.', $partsFile);
         $csvDir			= $dir.'/csv/';
+        @rmdir($csvDir);
         @mkdir($csvDir);
         $csvFilename 	= $csvDir.$csvFile;
 
@@ -246,6 +247,7 @@ class Lingo
     					'status'	=> $push
     				];
     				array_push($retval, $status);
+
     				if ($push['status'] == 'Success') {
     					$this->removeFile($file);
     				}
