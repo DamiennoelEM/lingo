@@ -189,14 +189,14 @@ class Lingo
         array_push($partsFile, 'csv');
         $csvFile 		= implode('.', $partsFile);
         $csvDir			= $dir.'/csv/';
-        
+
         @mkdir($csvDir);
         $csvFilename 	= $csvDir.$csvFile;
+        $this->removeFile($csvFilename);
 
         $data = include($filename);
         $oneDimension = $this->prepareTranslationFile($data);
 
-        $this->removeFile($csvFilename);
         $fp = fopen($csvFilename, 'w');
         
         $header = array_merge($this->rows, $this->lang);
