@@ -46,5 +46,17 @@ class Pull extends Command
         if (trim($directory) == "default") {
             $directory = $path;
         }
+
+        $projects = $lingo->projects();
+   
+        if (empty($projects)) {
+            $this->info('No projects found on LingoHub. Please create some. Exiting... ');
+            exit();
+        }
+
+        $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
+        $lingo->setProject($projectIndex);
+
+        
     }
 }

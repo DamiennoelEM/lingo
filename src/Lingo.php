@@ -265,7 +265,7 @@ class Lingo
     {
         $link = 'https://api.lingohub.com/v1/marko-zagar/projects/testproject/resources/file4.en.csv?auth_token='. $this->token;
 
-        $p = file_get_contents($link);
+        $p = file_get_contents($this->generateProjectsLink('resources.json'));
         $file = 'test_back.csv';
         file_put_contents($file, $p);
         $s = $this->getParseFromFile($file);
