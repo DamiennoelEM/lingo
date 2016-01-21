@@ -65,6 +65,13 @@ class Lingo
 		}
 	}
 
+	private function removeDirectory($dir)
+	{
+		if (is_dir($dir)) {
+			rmdir($dir);
+		}
+	}
+
 	public function setWorkingDir($directory, $scan = true)
 	{
 		$this->workingDir = $directory;
@@ -134,7 +141,11 @@ class Lingo
 		$ignore = ['.', '..'];
 		foreach ($dirs as $dir) {
 			if (!in_array($dir, $ignore)) {
-				if (is_dir($this->workingDir.$dir)) {		
+				$currentDir = $this->workingDir.$dir;
+				if (is_dir($currentDir)) {	
+					/*if ($dir == 'csv') {
+						$this->removeDirectory($currentDir);
+					}*/	
 					array_push($this->dirs, $this->workingDir.$dir);
 					array_push($this->lang, $dir);
 				}
@@ -165,6 +176,12 @@ class Lingo
 		$ignore = ['.', '..'];
 		foreach ($files as $file) {
 			if (!in_array($file, $ignore)) {
+				if (is_dir($file)) {
+					if ($dir == 'csv') {
+						$this->removeDirectory($dir.'/'.$file);
+					}
+					continue;
+				} 
 				if (stripos($file, ".csv") === false) {
 					$filename = $dir.'/'.$file;
 					array_push($retval['php'], $filename);
@@ -191,7 +208,6 @@ class Lingo
         $csvDir			= $dir.'/csv/';
 
         @mkdir($csvDir);
-        $csvFilename 	= $csvDir.$csvFile;
         $this->removeFile($csvFilename);
 
         $data = include($filename);
