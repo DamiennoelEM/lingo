@@ -61,7 +61,7 @@ class Lingo
 	public function setWorkingDir($directory, $scan = true)
 	{
 		$this->workingDir = $directory;
-		
+
 		if ($scan) {
 			$this->scanLangDir();
 		}
@@ -121,7 +121,7 @@ class Lingo
 		}
 	}
 
-	public function scanLangDir()
+	private function scanLangDir()
 	{
 		$dirs = scandir($this->workingDir);
 		$ignore = ['.', '..'];
@@ -134,12 +134,6 @@ class Lingo
 			}
 		}
 		return $this->dirs;
-	}
-
-	public function pushFiles()
-	{
-		$this->processLangDir();
-		return $this->startPushFiles();
 	}
 
 	public function addLanguage($lang)
@@ -226,6 +220,12 @@ class Lingo
         }
         return $retval;
     }
+
+    public function pushFiles()
+	{
+		$this->processLangDir();
+		return $this->startPushFiles();
+	}
 
     private function startPushFiles()
     {
