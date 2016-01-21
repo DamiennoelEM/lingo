@@ -272,7 +272,7 @@ class Lingo
 
 	public function getLocalePullNames()
 	{
-		return $this->localePullNames = array_combine(array_keys($this->localeResources), ['all']);
+		return $this->localePullNames = array_merge(array_keys($this->localeResources), ['all']);
 	}
 
 	public function setFilesToExport($resourceIndex)
