@@ -208,6 +208,7 @@ class Lingo
         $csvDir			= $dir.'/csv/';
 
         @mkdir($csvDir);
+       	$csvFilename 	= $csvDir.$csvFile;
         $this->removeFile($csvFilename);
 
         $data = include($filename);
