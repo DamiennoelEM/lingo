@@ -28,6 +28,9 @@ class Lingo
 	public 		$lang = [];
 	public 		$rows = ['Title'];
 
+	private 	$pullDirectories = [];
+	private 	$pushDirectories = [];
+
 	public 		$dirs = [];
 
 	public function __construct($apiKey, $lingoUser)
@@ -67,8 +70,18 @@ class Lingo
 
 	private function removeDirectory($dir)
 	{
-		if (is_dir($dir)) {
-			rmdir($dir);
+	   	$files = array_diff(scandir($dir), ['.','..']); 
+	    foreach ($files as $file) { 
+	    	$currentDirectory = $dir. '/'. $file;
+	      	is_dir($currentDirectory) ? $this->removeDirectory($currentDirectory) : unlink($currentDirectory); 
+	    } 
+	    return rmdir($dir); 
+	}
+
+	private function removeDirectories($dirs)
+	{
+		foreach ($dirs as $dir) {
+			$this->removeDirectory($dir);
 		}
 	}
 
@@ -137,18 +150,12 @@ class Lingo
 
 	private function scanLangDir()
 	{
-		$dirs = scandir($this->workingDir);
-		$ignore = ['.', '..'];
+		$dirs = array_diff(scandir($this->workingDir), ['.','..']); 
 		foreach ($dirs as $dir) {
-			if (!in_array($dir, $ignore)) {
-				$currentDir = $this->workingDir.$dir;
-				if (is_dir($currentDir)) {	
-					/*if ($dir == 'csv') {
-						$this->removeDirectory($currentDir);
-					}*/	
-					array_push($this->dirs, $this->workingDir.$dir);
-					array_push($this->lang, $dir);
-				}
+			$currentDir = $this->workingDir.$dir;
+			if (is_dir($currentDir)) {	
+				array_push($this->dirs, $this->workingDir.$dir);
+				array_push($this->lang, $dir);
 			}
 		}
 		return $this->dirs;
@@ -171,24 +178,22 @@ class Lingo
 
 	private function processLangFiles($dir)
 	{
-		$files = scandir($dir);
+		$files = array_diff(scandir($dir), ['.','..']); 
 		$retval = ['php' => [], 'csv' => []];
-		$ignore = ['.', '..'];
 		foreach ($files as $file) {
-			if (!in_array($file, $ignore)) {
-				if (is_dir($file)) {
-					if ($dir == 'csv') {
-						$this->removeDirectory($dir.'/'.$file);
-					}
-					continue;
-				} 
-				if (stripos($file, ".csv") === false) {
-					$filename = $dir.'/'.$file;
-					array_push($retval['php'], $filename);
+			$directory = $dir.'/'.$file;
 
-					$csvFilename = $this->createCsv($dir, $file);
-					array_push($retval['csv'], $csvFilename);
-				}
+			if (is_dir($directory) && $file == 'csv') {
+				// TODO create support for multiple directories
+				continue;
+			} 
+
+			if (stripos($file, ".csv") === false) {
+				$filename = $directory;
+				array_push($retval['php'], $filename);
+
+				$csvFilename = $this->createCsv($dir, $file);
+				array_push($retval['csv'], $csvFilename);
 			}
 		}
 		return $retval;
@@ -204,10 +209,12 @@ class Lingo
         $partsFile = explode('.', $file);
         array_pop($partsFile);
         array_push($partsFile, 'csv');
+
         $csvFile 		= implode('.', $partsFile);
         $csvDir			= $dir.'/csv/';
-
         @mkdir($csvDir);
+        array_push($this->pushDirectories, $csvDir);
+
        	$csvFilename 	= $csvDir.$csvFile;
         $this->removeFile($csvFilename);
 
@@ -272,6 +279,9 @@ class Lingo
     			}
     		}
     	}
+
+    	$this->removeDirectories(array_unique($this->pushDirectories));
+
     	return $retval;
     }
 
@@ -347,6 +357,8 @@ class Lingo
  			array_push($retval, $this->fetchFile($file['links']['self']['href'], $file['name']));
  		}
 
+ 		$this->removeDirectories(array_unique($this->pullDirectories));
+
  		return $retval;
  	}
 
@@ -362,7 +374,10 @@ class Lingo
         array_push($partsFile, $ext);
 		$csvFile 		= implode('.', $partsFile);
 
-        $csvDir			= $this->workingDir.'pulled-csv/'.$folder.'/';
+		$rootCsvDir		= $this->workingDir.'csv/';
+        $csvDir			= $rootCsvDir.$folder.'/';
+        array_push($this->pullDirectories, $rootCsvDir);
+
         @mkdir($csvDir, 0777, true);
         $csvFilename 	= $csvDir.$csvFile;
         
@@ -375,19 +390,26 @@ class Lingo
 	        ];
 	    }
 
-        return  $this->createFromCsv($csvFilename, $csvDir, $file);
+        return  $this->createFromCsv($csvFilename, $folder, $file);
     }
 
-    private function createFromCsv($csvFilename, $csvDir, $file)
+    private function createFromCsv($csvFilename, $folder, $file)
     {
         $retval = [];
         $reader = Reader::createFromPath($csvFilename);
+
         foreach ($reader->fetch() as $key=>$row) {
             if ($key != 0) {
                 Arr::set($retval, $row[0], $row[2]);
             }
         }
-        $filename = $csvDir.$file.'.php';
+
+        $filename = $this->workingDir.$folder .'/'. $file.'.php';
+
+        if (file_exists($filename)) {
+        	rename($filename, $filename.'_old');
+        }
+
         $fileCreate = file_put_contents($filename, "<?php\nreturn " . var_export($retval, true) . ';');
 
         return [
