@@ -48,7 +48,6 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 		$lingo = new Lingo($this->apiKey, $this->user);
 
 		$lingo->setWorkingDir('resources/lang/');
-		$lingo->scanLangDir();
 
 		$lingo->getProjects();
 		$lingo->setProject(0);
@@ -61,8 +60,7 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 	{
 		$lingo = new Lingo($this->apiKey, $this->user);
 
-		$lingo->setWorkingDir('resources/lang/');
-		$lingo->scanLangDir();
+		$lingo->setWorkingDir('resources/lang/', false);
 
 		$lingo->getProjects();
 		$lingo->setProject(0);

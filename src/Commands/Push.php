@@ -48,7 +48,6 @@ class Push extends Command
             $directory = $path;
         }
         $lingo->setWorkingDir($directory);
-        $lingo->scanLangDir();
 
         if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
             $stop = 'q';

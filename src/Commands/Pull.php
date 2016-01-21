@@ -47,7 +47,7 @@ class Pull extends Command
         if (trim($directory) == $default) {
             $directory = $path;
         }
-        $lingo->setWorkingDir($directory);
+        $lingo->setWorkingDir($directory, false);
 
         $projects = $lingo->getProjects();
    

@@ -58,9 +58,15 @@ class Lingo
 		return $link.'?auth_token='.$this->apiKey;
 	}
 
-	public function setWorkingDir($directory)
+	public function setWorkingDir($directory, $scan = true)
 	{
-		return $this->workingDir = $directory;
+		$this->workingDir = $directory;
+		
+		if ($scan) {
+			$this->scanLangDir();
+		}
+
+		return $this->workingDir;
 	}
 
 	public function getProjects()
@@ -238,7 +244,7 @@ class Lingo
     	return $retval;
     }
 
-    public function pushFile($filename, $lang)
+    private function pushFile($filename, $lang)
     {
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
@@ -341,7 +347,7 @@ class Lingo
         return  $this->createFromCsv($csvFilename, $csvDir, $file);
     }
 
-    public function createFromCsv($csvFilename, $csvDir, $file)
+    private function createFromCsv($csvFilename, $csvDir, $file)
     {
         $retval = [];
         $reader = Reader::createFromPath($csvFilename);
