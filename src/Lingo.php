@@ -1,8 +1,6 @@
 <?php 
 namespace Chipolo\Lingo;
 
-use League\Csv\Reader;
-
 use Chipolo\Lingo\Support\Arr;
 use Chipolo\Lingo\Helpers;
 
