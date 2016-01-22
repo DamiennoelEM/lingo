@@ -10,13 +10,11 @@
         }
     ],
     "require-dev": {
+        "phpunit/phpunit": "^5.1"
     },
     "autoload": {
         "psr-4": {
             "Chipolo\\Lingo\\": "src"
         }
-    },
-    "require": {
-        "phpunit/phpunit": "^5.1"
     }
 }
