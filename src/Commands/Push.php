@@ -30,6 +30,7 @@ class Push extends Command
     {
         $apiKey     = config('lingohub.apiKey', '');
         $user       = config('lingohub.username', '');
+        $project    = config('lingohub.project', '');
 
         if ($apiKey == '') {
             $apiKey = $this->ask('Can\'t find api key in lingohub config, please insert it now.');
@@ -38,7 +39,7 @@ class Push extends Command
         if ($user == '') {
             $user = $this->ask('Can\'t find username in lingohub config, please insert it now.');
         }
-        
+
         if ($project == '') {
             $project = $this->ask('Can\'t find project in lingohub config, please insert it now.');
         }
@@ -75,8 +76,9 @@ class Push extends Command
         }
 
         if (!$lingo->setProject($project)) {
-             $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
-             $lingo->setProject($projectIndex);
+            $this->info('Couldn\'t find project you set.');
+            $projectIndex = $this->choice('Please select project on LingoHub for current project', $lingo->getProjectsNames(), 0);
+            $lingo->setProject($projectIndex);
         }
 
         $retval = $lingo->pushFiles();

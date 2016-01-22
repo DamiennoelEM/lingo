@@ -62,13 +62,14 @@ class Pull extends Command
         }
 
         if (!$lingo->setProject($project)) {
-             $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
+            $this->info('Couldn\'t find project you set.');
+            $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
              $lingo->setProject($projectIndex);
         }
 
         $resources = $lingo->getResources();
         
-        $projectLocale = $this->choice('Please select locale you wish to export.', $lingo->getLocalePullNames());
+        $projectLocale = $this->choice('Please select locale you wish to export', $lingo->getLocalePullNames());
         $lingo->setResource($projectLocale);
 
       
