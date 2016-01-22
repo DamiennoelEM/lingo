@@ -399,9 +399,12 @@ class Lingo
         $retval = [];
         $reader = Reader::createFromPath($csvFilename);
 
+        $index = 2; //  We assume this will be always available
         foreach ($reader->fetch() as $key=>$row) {
-            if ($key != 0) {
-                Arr::set($retval, $row[0], $row[2]);
+            if ($key == 0) {
+            	$index = array_search($folder, $row);
+            } else {
+            	Arr::set($retval, $row[0], $row[$index]);
             }
         }
 
