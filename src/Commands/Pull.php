@@ -30,6 +30,7 @@ class Pull extends Command
     {
         $apiKey     = config('lingohub.apiKey', '');
         $user       = config('lingohub.username', '');
+        $project    = config('lingohub.project', '');
 
         if ($apiKey == '') {
             $apiKey = $this->ask('Can\'t find api key in lingohub config, please insert it now.');
@@ -37,6 +38,10 @@ class Pull extends Command
 
         if ($user == '') {
             $user = $this->ask('Can\'t find username in lingohub config, please insert it now.');
+        }
+
+        if ($project == '') {
+            $project = $this->ask('Can\'t find project in lingohub config, please insert it now.');
         }
 
         $lingo = new Lingo($apiKey, $user);
@@ -56,8 +61,10 @@ class Pull extends Command
             exit();
         }
 
-        $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
-        $lingo->setProject($projectIndex);
+        if (!$lingo->setProject($project)) {
+             $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
+             $lingo->setProject($projectIndex);
+        }
 
         $resources = $lingo->getResources();
         

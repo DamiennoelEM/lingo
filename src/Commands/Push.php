@@ -38,6 +38,10 @@ class Push extends Command
         if ($user == '') {
             $user = $this->ask('Can\'t find username in lingohub config, please insert it now.');
         }
+        
+        if ($project == '') {
+            $project = $this->ask('Can\'t find project in lingohub config, please insert it now.');
+        }
 
         $lingo = new Lingo($apiKey, $user);
         $path = 'resources/lang/';
@@ -70,8 +74,10 @@ class Push extends Command
             exit();
         }
 
-        $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
-        $lingo->setProject($projectIndex);
+        if (!$lingo->setProject($project)) {
+             $projectIndex = $this->choice('Please select project on LingoHub for current project.', $lingo->getProjectsNames(), 0);
+             $lingo->setProject($projectIndex);
+        }
 
         $retval = $lingo->pushFiles();
 
