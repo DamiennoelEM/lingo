@@ -84,7 +84,7 @@ class Push extends Command
             $this->info('Upload status for file - '. $value['file'].': '.$status);
         }
         if (!$valid) {
-            $this->info('Some files failed to update, check LingoHub Web Gui for more info.');
+            $this->info('Some files failed to upload, check LingoHub Web Gui for more info.');
         } else {
             $this->info('All files uploaded successfully.');
         }

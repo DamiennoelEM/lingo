@@ -42,8 +42,6 @@ class Lingo
             'exceptions'        => true,
             'redirect.disable'  => true
         ]);
-
-        $this->rows   = ['Title'];
 	}
 
 	private function generateProjectsLink($call)
@@ -403,8 +401,10 @@ class Lingo
                 Arr::set($retval, $row[0], $row[2]);
             }
         }
-
-        $filename = $this->workingDir.$folder .'/'. $file.'.php';
+        
+        $langFolder = $this->workingDir.$folder;
+        @mkdir($langFolder);
+        $filename =  $langFolder.'/'. $file.'.php';
 
         if (file_exists($filename)) {
         	rename($filename, $filename.'_old');
