@@ -155,41 +155,45 @@ class Lingo
 	{
 		array_push($this->lang, $lang);
 		$this->lang = array_unique($this->lang);
-		return $this->lang;
+		return $this->lang;4
 	}
 
 	private function processLangDir() 
 	{
+		$files = [];
 		foreach ($this->dirs as $dir) {
-			$this->files[$dir] = $this->processLangFiles($dir);
+			$dirParts = explode('/', $dir);
+			$lang = array_pop($dirParts);
+			$this->processLangFiles($dir);
 		}
-		return $this->files;
+		var_dump($this->files);
 	}
 
 	private function processLangFiles($dir)
 	{
 		$files = array_diff(scandir($dir), ['.','..']); 
-		$retval = ['php' => [], 'csv' => []];
+		
 		foreach ($files as $file) {
 			$directory = $dir.'/'.$file;
 
-			if (is_dir($directory) && $file == 'csv') {
+			if (is_dir($directory)) {
 				// TODO create support for multiple directories
 				continue;
 			} 
 
 			$fileParts = explode('.', $file);
 			$ext = array_pop($fileParts);
+			$dirParts = explode('/', $dir);
+			$lang = array_pop($dirParts);
 
 			if ($ext == 'php') {
-				$filename = $directory;
-				array_push($retval['php'], $filename);
-
-				$csvFilename = $this->createCsv($dir, $file);
-				array_push($retval['csv'], $csvFilename);
+				$this->files[$file][$lang] = ['dir' => $dir, 'file' => $file];
 			}
 		}
-		return $retval;
+
+		foreach ($this->files as $file => $lang) {
+			# code...
+		}
 	}
 
 	private function createCsv($dir, $file)
@@ -214,6 +218,11 @@ class Lingo
         $data = include($filename);
         $oneDimension = $this->prepareTranslationFile($data);
 
+
+
+
+
+/***************************************************************/
         $fp = fopen($csvFilename, 'w');
         
         $header = array_merge($this->rows, $this->lang);
@@ -280,6 +289,9 @@ class Lingo
 
     private function pushFile($filename, $lang)
     {
+    	return [
+    		'status' => 'Sucess'
+    	];
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
 
