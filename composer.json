@@ -9,10 +9,6 @@
             "email": "marko.zagar@chipolo.net"
         }
     ],
-    "require": {
-        "guzzlehttp/guzzle": "~3",
-        "league/csv": "^8.0"
-    },
     "require-dev": {
         "phpunit/phpunit": "4.0.*"
     },

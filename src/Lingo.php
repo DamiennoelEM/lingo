@@ -1,7 +1,6 @@
 <?php 
 namespace Chipolo\Lingo;
 
-use Guzzle\Service\Client;
 use League\Csv\Reader;
 
 use Chipolo\Lingo\Support\Arr;
@@ -37,11 +36,6 @@ class Lingo
 	{
 		$this->apiKey 		= $apiKey;
 		$this->lingoUser 	= $lingoUser;
-
-		$this->client = new Client([
-            'exceptions'        => true,
-            'redirect.disable'  => true
-        ]);
 	}
 
 	private function generateProjectsLink($call)
@@ -96,10 +90,10 @@ class Lingo
 
 	public function getProjects()
 	{
-		$request = $this->client->get($this->generateBasicLink('projects.json'));
-        $response = $request->send();
+		$request = file_get_contents($this->generateBasicLink('projects.json'));
+		$response = json_decode($request, true);
 
-        $this->projects = array_key_exists('members', $response->json()) ? $response->json()['members'] : [];
+       	$this->projects = array_key_exists('members', $response) ? $response['members'] : [];
 
         return $this->projects;
 	}
@@ -318,10 +312,10 @@ class Lingo
 
     public function getResources()
 	{
-		$request = $this->client->get($this->generateProjectsLink('resources.json'));
-        $response = $request->send();
+		$request = file_get_contents($this->generateProjectsLink('resources.json'));
+		$response = json_decode($request, true);
 
-       	$this->resources = array_key_exists('members', $response->json()) ? $response->json()['members'] : [];
+       	$this->resources = array_key_exists('members', $response) ? $response['members'] : [];
 
        	foreach ($this->resources as $resource) {
        		$this->localeResources[$resource['project_locale']][] = $resource;
@@ -397,10 +391,10 @@ class Lingo
     private function createFromCsv($csvFilename, $folder, $file)
     {
         $retval = [];
-        $reader = Reader::createFromPath($csvFilename);
+        $reader = array_map('str_getcsv', file($csvFilename));
 
         $index = 2; //  We assume this will be always available
-        foreach ($reader->fetch() as $key=>$row) {
+        foreach ($reader as $key=>$row) {
             if ($key == 0) {
             	$index = array_search($folder, $row);
             } else {
