@@ -186,7 +186,10 @@ class Lingo
 				continue;
 			} 
 
-			if (stripos($file, ".csv") === false) {
+			$fileParts = explode('.', $file);
+			$ext = array_pop($fileParts);
+
+			if ($ext == 'php') {
 				$filename = $directory;
 				array_push($retval['php'], $filename);
 
@@ -401,7 +404,7 @@ class Lingo
                 Arr::set($retval, $row[0], $row[2]);
             }
         }
-        
+
         $langFolder = $this->workingDir.$folder;
         @mkdir($langFolder);
         $filename =  $langFolder.'/'. $file.'.php';
