@@ -69,6 +69,6 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 		$lingo->setResource(0);
 
        	$retval = $lingo->pullFiles();
-       	//var_dump($retval);
+       	var_dump($retval);
 	}
 }

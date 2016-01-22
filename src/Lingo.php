@@ -388,7 +388,7 @@ class Lingo
 
         @mkdir($csvDir, 0777, true);
         $csvFilename 	= $csvDir.$csvFile;
-        
+
         $fileCreate = file_put_contents($csvFilename, $remoteFile);
 
         if ($fileCreate === false) {
@@ -404,7 +404,14 @@ class Lingo
     private function createFromCsv($csvFilename, $folder, $file)
     {
         $retval = [];
-        $reader = array_map('str_getcsv', file($csvFilename));
+        $reader = [];
+
+		ini_set('auto_detect_line_endings', true);
+		$handle = fopen($csvFilename, 'r');
+		while (($data = fgetcsv($handle)) !== false) {
+			array_push($reader, $data);
+		}
+		ini_set('auto_detect_line_endings', false);
 
         $index = 2; //  We assume this will be always available
         foreach ($reader as $key=>$row) {
