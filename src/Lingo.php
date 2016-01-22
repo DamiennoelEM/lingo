@@ -21,6 +21,7 @@ class Lingo
 	public 		$workingDir;
 
 	public 		$files = [];
+	public 		$pushDataFiles = [];
 	public 		$pullDataFiles = [];
 	public 		$lang = [];
 	public 		$rows = ['Title'];
@@ -155,24 +156,24 @@ class Lingo
 	{
 		array_push($this->lang, $lang);
 		$this->lang = array_unique($this->lang);
-		return $this->lang;4
+		return $this->lang;
 	}
 
 	private function processLangDir() 
 	{
 		$files = [];
 		foreach ($this->dirs as $dir) {
-			$dirParts = explode('/', $dir);
-			$lang = array_pop($dirParts);
 			$this->processLangFiles($dir);
 		}
-		var_dump($this->files);
+
+		foreach ($this->pushDataFiles as $file => $files) {
+			array_push($this->files, $this->createCsv($files, $file));
+		}
 	}
 
 	private function processLangFiles($dir)
 	{
 		$files = array_diff(scandir($dir), ['.','..']); 
-		
 		foreach ($files as $file) {
 			$directory = $dir.'/'.$file;
 
@@ -187,48 +188,57 @@ class Lingo
 			$lang = array_pop($dirParts);
 
 			if ($ext == 'php') {
-				$this->files[$file][$lang] = ['dir' => $dir, 'file' => $file];
+				$this->pushDataFiles[$file][$lang] = ['dir' => $dir, 'name' => $file];
 			}
-		}
-
-		foreach ($this->files as $file => $lang) {
-			# code...
 		}
 	}
 
-	private function createCsv($dir, $file)
+	private function createCsv($files, $filename)
     {
-    	$filename = $dir.'/'.$file;
-    	if (!file_exists($filename)) {
-    		return 'File '.$filename.'not found.';
+    	$csvCombine = [];
+    	foreach ($files as $lang => $file) {
+    		$filePath = $file['dir'].'/'.$file['name'];
+	    	if (!file_exists($filePath)) {
+	    		continue;
+	    	}
+
+    		$data = include($filePath);
+        	$oneDimension = $this->prepareTranslationFile($data);
+
+        	if (empty($csvCombine)) {
+        		$csvCombine = $oneDimension;
+        	} else {
+        		foreach ($csvCombine as $key => $combined) {
+        			foreach ($oneDimension as $item) {
+        				if (array_key_exists(0, $item) && array_key_exists(0, $combined)) {
+        					if ($combined[0] == $item[0]) {
+        						array_push($combined, $item[1]);
+        						$csvCombine[$key] = $combined;
+        					}
+        				}
+        			}
+        		}
+        	}
     	}
 
-        $partsFile = explode('.', $file);
-        array_pop($partsFile);
-        array_push($partsFile, 'csv');
+    	$rootCsvDir		= $this->workingDir.'csv-push/';
+    	array_push($this->pushDirectories, $rootCsvDir);
+    
+    	$partsFilename = explode('.', $filename);
+    	array_pop($partsFilename);
+    	array_push($partsFilename, 'csv');
 
-        $csvFile 		= implode('.', $partsFile);
-        $csvDir			= $dir.'/csv/';
-        @mkdir($csvDir);
-        array_push($this->pushDirectories, $csvDir);
+    	@mkdir($rootCsvDir);
 
-       	$csvFilename 	= $csvDir.$csvFile;
+    	$csvFilename 	= $rootCsvDir.implode('.', $partsFilename);
         $this->removeFile($csvFilename);
 
-        $data = include($filename);
-        $oneDimension = $this->prepareTranslationFile($data);
-
-
-
-
-
-/***************************************************************/
-        $fp = fopen($csvFilename, 'w');
-        
         $header = array_merge($this->rows, $this->lang);
+
+        $fp = fopen($csvFilename, 'w');
         fwrite($fp, Helpers::arrayToCsv($header, ',', '"', true)."\n");
 
-        foreach ($oneDimension as $fields) {
+        foreach ($csvCombine as $fields) {
             $count = count($this->rows) + count($this->lang) - count($fields);
 
             $newFields = [];
@@ -265,21 +275,17 @@ class Lingo
     private function startPushFiles()
     {
     	$retval = [];
-    	foreach ($this->files as $lang => $type) {
-    		if (array_key_exists('csv', $type)) {
-    			foreach ($type['csv'] as $file) {
-    				$push = $this->pushFile($file, $lang);
-    				$status = [
-    					'file' 		=> $file,
-    					'status'	=> $push
-    				];
-    				array_push($retval, $status);
+    	foreach ($this->files as $file) {
+			$push = $this->pushFile($file);
+			$status = [
+				'file' 		=> $file,
+				'status'	=> $push
+			];
+    		array_push($retval, $status);
 
-    				if ($push['status'] == 'Success') {
-    					$this->removeFile($file);
-    				}
-    			}
-    		}
+			if ($push['status'] == 'Success') {
+				$this->removeFile($file);
+			}
     	}
 
     	$this->removeDirectories(array_unique($this->pushDirectories));
@@ -287,11 +293,8 @@ class Lingo
     	return $retval;
     }
 
-    private function pushFile($filename, $lang)
+    private function pushFile($filename, $lang = 'en')
     {
-    	return [
-    		'status' => 'Sucess'
-    	];
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
 
@@ -379,7 +382,7 @@ class Lingo
         array_push($partsFile, $ext);
 		$csvFile 		= implode('.', $partsFile);
 
-		$rootCsvDir		= $this->workingDir.'csv/';
+		$rootCsvDir		= $this->workingDir.'csv-pull/';
         $csvDir			= $rootCsvDir.$folder.'/';
         array_push($this->pullDirectories, $rootCsvDir);
 
