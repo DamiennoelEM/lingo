@@ -51,14 +51,14 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 
 		$projects = $lingo->getProjects();
 	
-		$lingo->setProject('api10');
+		$lingo->setProject('New');
 		//var_dump($lingo->lang);
 
 		$lingo->addLanguage('hr');
 		//var_dump($lingo->lang);
 
 		$retval = $lingo->pushFiles();
-		//var_dump($retval);
+		var_dump($retval);
 	}
 
 	public function testPullFiles()

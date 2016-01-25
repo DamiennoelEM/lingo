@@ -213,8 +213,12 @@ class Lingo
 	    	}
 
 	    	$index = array_search($lang, $header);
-
     		$data = include($filePath);
+
+    		if (!is_array($data)) {
+    			continue;
+    		}
+
         	$oneDimension = $this->prepareTranslationFile($data);
 
         	if (empty($csvCombine)) {
