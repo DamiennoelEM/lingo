@@ -31,27 +31,55 @@ class Lingo
 
 	public 		$dirs = [];
 
+	/**
+	 * @param string $apiKey
+	 * @param string $lingoUser
+	 */
 	public function __construct($apiKey, $lingoUser)
 	{
 		$this->apiKey 		= $apiKey;
 		$this->lingoUser 	= $lingoUser;
 	}
 
+	/**
+	 * Generates link for project calls
+	 * 
+	 * @param  string $call
+	 * @return string 	
+	 */
 	private function generateProjectsLink($call)
 	{
 		return $this->apiLink.$this->lingoUser.'/projects/'.$this->currentProjectName.'/'.$call.'?auth_token='.$this->apiKey;
 	}
-	
+
+	/**
+	 * Generates link for basic calls
+	 * 
+	 * @param  string $call
+	 * @return string 	
+	 */
 	private function generateBasicLink($call)
 	{
 		return $this->apiLink.$call.'?auth_token='.$this->apiKey;
 	}
 
+	/**
+	 * Generates link for resource
+	 * 
+	 * @param  string $call
+	 * @return string 	
+	 */
 	private function generateResourceLink($link)
 	{
 		return $link.'?auth_token='.$this->apiKey;
 	}
 
+	/**
+	 * Removes file
+	 * 
+	 * @param  string $file
+	 * @return void
+	 */
 	private function removeFile($file)
 	{
 		if (file_exists($file)) {
