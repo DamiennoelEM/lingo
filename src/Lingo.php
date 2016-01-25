@@ -239,12 +239,13 @@ class Lingo
         fwrite($fp, Helpers::arrayToCsv($header, ',', '"', true)."\n");
 
         foreach ($csvCombine as $fields) {
-            $count = count($this->rows) + count($this->lang) - count($fields);
+        	
+        	$fieldsCount = count($fields);
+            $count = count($this->rows) + count($this->lang) - $fieldsCount;
 
             $newFields = [];
             if ($count != 0) {
-                $fieldsCount = count($fields);
-                $newFields = array_fill($fieldsCount, $fieldsCount + $count -2, "");
+                $newFields = array_fill($fieldsCount - 1 , $count, "");
             }
             $output = array_merge($fields, $newFields);
 
@@ -281,14 +282,15 @@ class Lingo
 				'file' 		=> $file,
 				'status'	=> $push
 			];
+
     		array_push($retval, $status);
 
 			if ($push['status'] == 'Success') {
-				//$this->removeFile($file);
+				$this->removeFile($file);
 			}
     	}
 
-    	//$this->removeDirectories(array_unique($this->pushDirectories));
+    	$this->removeDirectories(array_unique($this->pushDirectories));
 
     	return $retval;
     }
