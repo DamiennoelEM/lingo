@@ -149,7 +149,16 @@ class Lingo
 				array_push($this->lang, $dir);
 			}
 		}
+		$this->sortLang();
 		return $this->dirs;
+	}
+
+	private function sortLang()
+	{
+		$index = array_search('en', $this->lang);
+		$element = $this->lang[$index];
+		unset($this->lang[$index]);
+		array_unshift($this->lang, $element);
 	}
 
 	public function addLanguage($lang)
@@ -195,12 +204,15 @@ class Lingo
 
 	private function createCsv($files, $filename)
     {
+    	$header = array_merge($this->rows, $this->lang);
     	$csvCombine = [];
     	foreach ($files as $lang => $file) {
     		$filePath = $file['dir'].'/'.$file['name'];
 	    	if (!file_exists($filePath)) {
 	    		continue;
 	    	}
+
+	    	$index = array_search($lang, $header);
 
     		$data = include($filePath);
         	$oneDimension = $this->prepareTranslationFile($data);
@@ -212,13 +224,27 @@ class Lingo
         			foreach ($oneDimension as $item) {
         				if (array_key_exists(0, $item) && array_key_exists(0, $combined)) {
         					if ($combined[0] == $item[0]) {
-        						array_push($combined, $item[1]);
+        						$combined[$index] = $item[1];
         						$csvCombine[$key] = $combined;
         					}
         				}
         			}
         		}
         	}
+    	}
+
+    	$finalCombine = [];
+    	foreach ($csvCombine as $key => $combined) {
+    		$k = 0;
+    		$newArray = [];
+    		for ($i = 0; $i < count($header); $i++) {
+    			if (!array_key_exists($i, $combined)) {
+    				$newArray[$i] = "";
+    			} else {
+    				$newArray[$i] = $combined[$i];
+    			}
+    		}
+    		array_push($finalCombine, $newArray);
     	}
 
     	$rootCsvDir		= $this->workingDir.'csv-push/';
@@ -233,23 +259,13 @@ class Lingo
     	$csvFilename 	= $rootCsvDir.implode('.', $partsFilename);
         $this->removeFile($csvFilename);
 
-        $header = array_merge($this->rows, $this->lang);
-
         $fp = fopen($csvFilename, 'w');
         fwrite($fp, Helpers::arrayToCsv($header, ',', '"', true)."\n");
 
-        foreach ($csvCombine as $fields) {
-        	
-        	$fieldsCount = count($fields);
-            $count = count($this->rows) + count($this->lang) - $fieldsCount;
+        foreach ($finalCombine as $fields) {
 
-            $newFields = [];
-            if ($count != 0) {
-                $newFields = array_fill($fieldsCount - 1 , $count, "");
-            }
-            $output = array_merge($fields, $newFields);
+            fwrite($fp, Helpers::arrayToCsv($fields, ',', '"', true)."\n");
 
-            fwrite($fp, Helpers::arrayToCsv($output, ',', '"', true)."\n");
         }
 
         fclose($fp);
@@ -286,17 +302,20 @@ class Lingo
     		array_push($retval, $status);
 
 			if ($push['status'] == 'Success') {
-				$this->removeFile($file);
+				//$this->removeFile($file);
 			}
     	}
 
-    	$this->removeDirectories(array_unique($this->pushDirectories));
+    	//$this->removeDirectories(array_unique($this->pushDirectories));
 
     	return $retval;
     }
 
     private function pushFile($filename, $lang = 'en')
     {
+    	/*return [
+    		'status' => 'Success'
+    	];*/
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
 

@@ -51,12 +51,14 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 
 		$projects = $lingo->getProjects();
 	
-		$lingo->setProject('Api6');
+		$lingo->setProject('api10');
+		//var_dump($lingo->lang);
 
 		$lingo->addLanguage('hr');
+		//var_dump($lingo->lang);
 
 		$retval = $lingo->pushFiles();
-		var_dump($retval);
+		//var_dump($retval);
 	}
 
 	public function testPullFiles()
@@ -66,10 +68,10 @@ class LingoTest extends PHPUnit_Framework_TestCase {
 		$lingo->setWorkingDir('resources/lang/', false);
 
 		$lingo->getProjects();
-		$lingo->setProject(0);
+		$lingo->setProject('api10');
 
 		$lingo->getResources();
-		$lingo->setResource(0);
+		$lingo->setResource('all');
 
        	$retval = $lingo->pullFiles();
        	var_dump($retval);
