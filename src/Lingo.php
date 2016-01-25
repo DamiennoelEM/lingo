@@ -302,11 +302,11 @@ class Lingo
     		array_push($retval, $status);
 
 			if ($push['status'] == 'Success') {
-				//$this->removeFile($file);
+				$this->removeFile($file);
 			}
     	}
 
-    	//$this->removeDirectories(array_unique($this->pushDirectories));
+    	$this->removeDirectories(array_unique($this->pushDirectories));
 
     	return $retval;
     }
