@@ -32,6 +32,8 @@ class Lingo
 	public 		$dirs = [];
 
 	/**
+	 * ApiKey and username that we use when we are connection to LingoHub
+	 * 
 	 * @param string $apiKey
 	 * @param string $lingoUser
 	 */
@@ -75,7 +77,7 @@ class Lingo
 	}
 
 	/**
-	 * Removes file
+	 * Removes file from filepath
 	 * 
 	 * @param  string $file
 	 * @return void
@@ -87,6 +89,12 @@ class Lingo
 		}
 	}
 
+	/**
+	 * Removes full directory tree and files from root directory given
+	 * 
+	 * @param  string $dir
+	 * @return boolean
+	 */
 	private function removeDirectory($dir)
 	{
 	   	$files = array_diff(scandir($dir), ['.','..']); 
@@ -97,6 +105,12 @@ class Lingo
 	    return rmdir($dir); 
 	}
 
+	/**
+	 * Takes range of directories and feeds them to recursive function to delete
+	 * 
+	 * @param  string $dir
+	 * @return void
+	 */
 	private function removeDirectories($dirs)
 	{
 		foreach ($dirs as $dir) {
@@ -104,9 +118,17 @@ class Lingo
 		}
 	}
 
-	public function setWorkingDir($directory, $scan = true)
+	/**
+	 * Here we set root working directory for current project and
+	 * have options to scan for files inside
+	 * 
+	 * @param string $dir
+	 * @param boolean $scan
+	 * @return string
+	 */
+	public function setWorkingDir($dir, $scan = true)
 	{
-		$this->workingDir = $directory;
+		$this->workingDir = $dir;
 
 		if ($scan) {
 			$this->scanLangDir();
@@ -115,6 +137,11 @@ class Lingo
 		return $this->workingDir;
 	}
 
+	/**
+	 * Gets projects for current apiKey from LingoHub
+	 * 	
+	 * @return array
+	 */
 	public function getProjects()
 	{
 		$request = file_get_contents($this->generateBasicLink('projects.json'));
@@ -125,6 +152,11 @@ class Lingo
         return $this->projects;
 	}
 
+	/**
+	 * Take projects and get their title and put them into array for displaying
+	 * 
+	 * @return array
+	 */
 	public function getProjectsNames()
 	{
 		$retval = [];
@@ -134,6 +166,11 @@ class Lingo
 		return $retval;
 	}
 
+	/**
+	 * Set project on which we will work on
+	 * 
+	 * @param boolean
+	 */
 	public function setProject($addProject)
 	{
 		foreach ($this->projects as $project) {
@@ -148,11 +185,22 @@ class Lingo
 		return false;
 	}
 	
+	/**
+	 * Set current project name for creating request links for LingoHub
+	 * 
+	 * @param string
+	 */
 	private function setProjectName($name)
 	{
 		return $this->currentProjectName = strtolower($name);
 	}
 
+	/**
+	 * Get one project from LingoHub and make links easier accessible
+	 * 
+	 * @param  array $project
+	 * @return array
+	 */
 	private function prepareResource($project)
 	{
 		if (array_key_exists('links', $project)) {
@@ -167,6 +215,11 @@ class Lingo
 		}
 	}
 
+	/**
+	 * Take working directory of current project and get its language directories
+	 * 
+	 * @return array
+	 */
 	private function scanLangDir()
 	{
 		$dirs = array_diff(scandir($this->workingDir), ['.','..']); 
@@ -181,6 +234,11 @@ class Lingo
 		return $this->dirs;
 	}
 
+	/**
+	 * Sort languages we set with scanning so English is always first
+	 * 
+	 * @return void
+	 */
 	private function sortLang()
 	{
 		$index = array_search('en', $this->lang);
@@ -189,6 +247,11 @@ class Lingo
 		array_unshift($this->lang, $element);
 	}
 
+	/**
+	 * Add language we didn't find from scanning, via command
+	 * 
+	 * @param array
+	 */
 	public function addLanguage($lang)
 	{
 		array_push($this->lang, $lang);
@@ -196,6 +259,11 @@ class Lingo
 		return $this->lang;
 	}
 
+	/**
+	 * Take directories from project and fetch its relevant files
+	 * 
+	 * @return void
+	 */
 	private function processLangDir() 
 	{
 		$files = [];
@@ -208,6 +276,12 @@ class Lingo
 		}
 	}
 
+	/**
+	 * Take one directory and get php files which we assume return array with translation files
+	 * 
+	 * @param  string $dir
+	 * @return void
+	 */
 	private function processLangFiles($dir)
 	{
 		$files = array_diff(scandir($dir), ['.','..']); 
@@ -230,31 +304,49 @@ class Lingo
 		}
 	}
 
+	/**
+	 * Get files from project (all files from all languages) same file from all languages
+	 * and create one csv that combines all
+	 * 
+	 * @param  array $files
+	 * @param  string $filename
+	 * @return string
+	 */
 	private function createCsv($files, $filename)
     {
+    	// Make csv header from title and all the languages
     	$header = array_merge($this->rows, $this->lang);
     	$csvCombine = [];
+
+    	// Go trough all the files
     	foreach ($files as $lang => $file) {
     		$filePath = $file['dir'].'/'.$file['name'];
 	    	if (!file_exists($filePath)) {
 	    		continue;
 	    	}
 
+	    	// Find index from header so we know on which place to write it
 	    	$index = array_search($lang, $header);
+	    	// Get array from language file
     		$data = include($filePath);
 
+    		// If file is empty we skip
     		if (!is_array($data)) {
     			continue;
     		}
 
+    		// We make array one dimensional with laravel dot magic
         	$oneDimension = $this->prepareTranslationFile($data);
 
+        	// Start combining files from different languages
         	if (empty($csvCombine)) {
         		$csvCombine = $oneDimension;
         	} else {
         		foreach ($csvCombine as $key => $combined) {
         			foreach ($oneDimension as $item) {
         				if (array_key_exists(0, $item) && array_key_exists(0, $combined)) {
+        					// If we have primary key we add value to the current row 
+        					// on the index place we got from header
         					if ($combined[0] == $item[0]) {
         						$combined[$index] = $item[1];
         						$csvCombine[$key] = $combined;
@@ -265,6 +357,7 @@ class Lingo
         	}
     	}
 
+    	// Feel the unset indexes with empty values
     	$finalCombine = [];
     	foreach ($csvCombine as $key => $combined) {
     		$k = 0;
@@ -279,6 +372,7 @@ class Lingo
     		array_push($finalCombine, $newArray);
     	}
 
+    	// Calculate path and filename for current csv created
     	$rootCsvDir		= $this->workingDir.'csv-push/';
     	array_push($this->pushDirectories, $rootCsvDir);
     
@@ -291,20 +385,30 @@ class Lingo
     	$csvFilename 	= $rootCsvDir.implode('.', $partsFilename);
         $this->removeFile($csvFilename);
 
+        // Start writing csv file
         $fp = fopen($csvFilename, 'w');
+        // Header that needs title and languages
         fwrite($fp, Helpers::arrayToCsv($header, ',', '"', true)."\n");
 
         foreach ($finalCombine as $fields) {
-
+        	// Break array and combined it to the string via helper function
+        	// so we can make proper csv easier
             fwrite($fp, Helpers::arrayToCsv($fields, ',', '"', true)."\n");
 
         }
 
         fclose($fp);
-
+        // Return filename we were working on
         return $csvFilename;
     }
 
+    /**
+     * Get returned array from language file and use Laravel's sneaky dot notation 
+     * to make array one dimensional
+     * 
+     * @param  array $data
+     * @return array
+     */
     private function prepareTranslationFile($data)
     {
         $retval = [];
@@ -315,12 +419,22 @@ class Lingo
         return $retval;
     }
 
+    /**
+     * Start pusing files that we prepared via other functions
+     * 
+     * @return array
+     */
     public function pushFiles()
 	{
 		$this->processLangDir();
 		return $this->startPushFiles();
 	}
 
+	/**
+	 * Push files one by one, remove it and remove everything after we are done
+	 * 
+	 * @return array
+	 */
     private function startPushFiles()
     {
     	$retval = [];
@@ -343,6 +457,13 @@ class Lingo
     	return $retval;
     }
 
+    /**
+     * Push one file via curl to LingoHub and set its default language
+     * 
+     * @param  string $filename
+     * @param  string $lang
+     * @return array
+     */
     private function pushFile($filename, $lang = 'en')
     {
     	/*return [
@@ -376,6 +497,11 @@ class Lingo
         return json_decode($body, true);
     }
 
+    /**
+     * Fetch resources (all language files) from LingoHub for current project
+     * 
+     * @return array
+     */
     public function getResources()
 	{
 		$request = file_get_contents($this->generateProjectsLink('resources.json'));
@@ -391,11 +517,22 @@ class Lingo
        	return $this->localeResources;
 	}
 
+	/**
+	 * Get language names from resources we set before
+	 * 
+	 * @return array
+	 */
 	public function getLocalePullNames()
 	{
 		return array_merge(array_keys($this->localeResources), ['all']);
 	}
 
+	/**
+	 * Set resource we will use from resources we got from LingoHub, either all languages or just one
+	 * 
+	 * @param 	string $resourceIndex
+	 * @return  array
+	 */
 	public function setResource($resourceIndex)
 	{
 		if (array_key_exists($resourceIndex,  $this->localeResources)) {
@@ -411,6 +548,12 @@ class Lingo
 		return $this->pullDataFiles;
 	}
 
+
+	/**
+	 * Start pulling files from LingoHub, return success rate and remove temp directories afters
+	 * 
+	 * @return array
+	 */
 	public function pullFiles()
  	{
  		$retval = [];
@@ -423,8 +566,15 @@ class Lingo
  		return $retval;
  	}
 
+ 	/**
+ 	 * Fetch specific file from LingoHub and save it to temporary file
+ 	 * 
+ 	 * @param  string $url
+ 	 * @param  string $name
+ 	 * @return array
+ 	 */
     private function fetchFile($url, $name)
-    {
+    {	
         $remoteFile = file_get_contents($this->generateResourceLink($url));
 
         $partsFile = explode('.', $name);
@@ -454,6 +604,15 @@ class Lingo
         return  $this->createFromCsv($csvFilename, $folder, $file);
     }
 
+    /**
+     * Create php file and save it to the correct directory,
+     * from csv file created from LingoHub
+     * 
+     * @param  string $csvFilename
+     * @param  string $langFolder
+     * @param  string $file
+     * @return array
+     */
     private function createFromCsv($csvFilename, $folder, $file)
     {
         $retval = [];
