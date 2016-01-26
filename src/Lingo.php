@@ -337,22 +337,21 @@ class Lingo
 
     		// We make array one dimensional with laravel dot magic
         	$oneDimension = $this->prepareTranslationFile($data);
-
-        	// Start combining files from different languages
+			// Start combining files from different languages
         	if (empty($csvCombine)) {
-        		$csvCombine = $oneDimension;
+        		foreach ($oneDimension as $key => $translation) {
+        			$combined = [];
+    				array_push($combined, $key);
+    				$combined[$index] = $translation;
+        			$csvCombine[$key] = $combined;
+        		}
         	} else {
-        		foreach ($csvCombine as $key => $combined) {
-        			foreach ($oneDimension as $item) {
-        				if (array_key_exists(0, $item) && array_key_exists(0, $combined)) {
-        					// If we have primary key we add value to the current row 
-        					// on the index place we got from header
-        					if ($combined[0] == $item[0]) {
-        						$combined[$index] = $item[1];
-        						$csvCombine[$key] = $combined;
-        					}
-        				}
-        			}
+        		foreach ($oneDimension as $key => $translation) {
+        			if (!array_key_exists($key, $csvCombine)) {
+        				$csvCombine[$key] = [$key];
+        			} 
+
+        			$csvCombine[$key][$index] = $translation;
         		}
         	}
     	}
@@ -364,7 +363,7 @@ class Lingo
     		$newArray = [];
     		for ($i = 0; $i < count($header); $i++) {
     			if (!array_key_exists($i, $combined)) {
-    				$newArray[$i] = "";
+    				$newArray[$i] = '';
     			} else {
     				$newArray[$i] = $combined[$i];
     			}
@@ -414,7 +413,7 @@ class Lingo
         $retval = [];
         $dots = Arr::dot($data);
         foreach ($dots as $key =>$item) {
-            $retval[] = [$key, $item];
+            $retval[$key] = $item;
         }
         return $retval;
     }
@@ -466,9 +465,9 @@ class Lingo
      */
     private function pushFile($filename, $lang = 'en')
     {
-    	/*return [
+    	return [
     		'status' => 'Success'
-    	];*/
+    	];
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
 
