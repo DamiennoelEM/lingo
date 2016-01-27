@@ -76,7 +76,7 @@ class Push extends Command
                 $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
             }
         } else {
-            $this->info('Found languages - ' .implode(', ', $lingo->lang). ' -;'
+            $this->info('Found languages - ' .implode(', ', $lingo->lang). ' -;');
         }
 
         
@@ -103,11 +103,13 @@ class Push extends Command
             }
             $this->info('Upload status for file - '. $value['file'].': '.$status);
         }
+        
         if (!$valid) {
             $this->info('Some files failed to upload, check LingoHub Web Gui for more info.');
         } else {
             $this->info('All files uploaded successfully.');
         }
+
         if ($showIgnored) {
             $ignored = $lingo->getIgnoredStrings();
             if (!empty($ignored)) {
