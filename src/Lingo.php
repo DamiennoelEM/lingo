@@ -525,9 +525,9 @@ class Lingo
      */
     private function pushFile($filename, $lang = false)
     {
-    	return [
+    	/*return [
     		'status' => 'Success'
-    	];
+    	];*/
 
     	if ($lang === false) {
     		$lang = $this->defaultLanguage;
