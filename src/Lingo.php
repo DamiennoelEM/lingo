@@ -19,6 +19,9 @@ class Lingo
 	public 		$currentProject;
 	public 		$currentProjectName;
 	public 		$workingDir;
+	public 		$defaultLanguage = 'en';
+	private 	$nonDefault = false;
+	private		$ignoredStrings = [];
 
 	public 		$files = [];
 	public 		$pushDataFiles = [];
@@ -241,7 +244,7 @@ class Lingo
 	 */
 	private function sortLang()
 	{
-		$index = array_search('en', $this->lang);
+		$index = array_search($this->defaultLanguage, $this->lang);
 		$element = $this->lang[$index];
 		unset($this->lang[$index]);
 		array_unshift($this->lang, $element);
@@ -271,8 +274,27 @@ class Lingo
 			$this->processLangFiles($dir);
 		}
 
+		$this->sortLangFiles();
+
 		foreach ($this->pushDataFiles as $file => $files) {
 			array_push($this->files, $this->createCsv($files, $file));
+		}
+
+	}
+
+	/**
+	 * Orders data files so we have default language on the first place
+	 * 
+	 * @return void
+	 */
+	private function sortLangFiles()
+	{
+		foreach ($this->pushDataFiles as $file => $files) {
+			if (array_key_exists($this->defaultLanguage, $files)) {
+				$element[$this->defaultLanguage] = $this->pushDataFiles[$file][$this->defaultLanguage];
+				unset($this->pushDataFiles[$file][$this->defaultLanguage]);
+				$this->pushDataFiles[$file] = array_merge($element, $this->pushDataFiles[$file]);
+			}
 		}
 	}
 
@@ -302,6 +324,29 @@ class Lingo
 				$this->pushDataFiles[$file][$lang] = ['dir' => $dir, 'name' => $file];
 			}
 		}
+	}
+
+	/**
+	 * Return array of keys that weren't in default language
+	 * 
+	 * @return array
+	 */
+	public function getIgnoredStrings()
+	{
+		return $this->ignoredStrings;
+	}
+
+	/**
+	 * Allow non default languages to create new keys
+	 * 
+	 * @param boolean
+	 */
+	public function setOverideNonDefault($bool) 
+	{
+		if (is_bool($bool)) {
+			$this->nonDefault = $bool;
+		}
+		return $this->nonDefault;
 	}
 
 	/**
@@ -347,10 +392,23 @@ class Lingo
         		}
         	} else {
         		foreach ($oneDimension as $key => $translation) {
-        			if (!array_key_exists($key, $csvCombine)) {
-        				$csvCombine[$key] = [$key];
+        			// If we find that something is not is our default language 
+        			// we remeber that so we can report it later
+        			if (!array_key_exists($key, $csvCombine)) {	
+        				// If we want to create new keys even from other languages 
+        				if ($this->nonDefault) {	
+							$csvCombine[$key] = [$key];
+						}
+    					
+    					$data = [
+    						'filePath' 	=> $filePath,
+    						'string'	=> $key,
+    						'language'	=> $lang
+    					];
+    					array_push($this->ignoredStrings, $data);
+    					
+    					continue;
         			} 
-
         			$csvCombine[$key][$index] = $translation;
         		}
         	}
@@ -370,7 +428,7 @@ class Lingo
     		}
     		array_push($finalCombine, $newArray);
     	}
-
+    	var_dump($finalCombine);
     	// Calculate path and filename for current csv created
     	$rootCsvDir		= $this->workingDir.'csv-push/';
     	array_push($this->pushDirectories, $rootCsvDir);
@@ -425,6 +483,7 @@ class Lingo
      */
     public function pushFiles()
 	{
+
 		$this->processLangDir();
 		return $this->startPushFiles();
 	}
@@ -436,6 +495,7 @@ class Lingo
 	 */
     private function startPushFiles()
     {
+
     	$retval = [];
     	foreach ($this->files as $file) {
 			$push = $this->pushFile($file);
@@ -463,11 +523,15 @@ class Lingo
      * @param  string $lang
      * @return array
      */
-    private function pushFile($filename, $lang = 'en')
+    private function pushFile($filename, $lang = false)
     {
     	return [
     		'status' => 'Success'
     	];
+
+    	if ($lang === false) {
+    		$lang = $this->defaultLanguage;
+    	}
     	$partsFile = explode('/', $filename);
         $file = array_pop($partsFile);
 

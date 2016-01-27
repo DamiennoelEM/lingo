@@ -96,5 +96,14 @@ class Push extends Command
         } else {
             $this->info('All files uploaded successfully.');
         }
+        $ignored = $lingo->getIgnoredStrings();
+        if (!empty($ignored)) {
+            if ($this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
+                foreach ($ignored as $key => $value) {
+                    $this->info('In file: '.$value['filePath']. ' language: '.$value['language']. ' string: '.$value['string']. ' was ignored.');
+                }
+            }
+        }
+ 
     }
 }
