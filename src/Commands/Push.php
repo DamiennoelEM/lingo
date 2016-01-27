@@ -28,9 +28,12 @@ class Push extends Command
      */
     public function handle()
     {
-        $apiKey     = config('lingohub.apiKey', '');
-        $user       = config('lingohub.username', '');
-        $project    = config('lingohub.project', '');
+        $apiKey         = config('lingohub.apiKey', '');
+        $user           = config('lingohub.username', '');
+        $project        = config('lingohub.project', '');
+        $defaultDir     = config('lingohub.defaultDirectory', false);
+        $noAddLang      = config('lingohub.noAddLang', false);
+        $showIgnored    = config('lingohub.showIgnoredStrings', false);
 
         if ($apiKey == '') {
             $apiKey = $this->ask('Can\'t find api key in lingohub config, please insert it now.');
@@ -48,25 +51,34 @@ class Push extends Command
         $path = 'resources/lang/';
         $default = 'd';
 
-        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        if (!$defaultDir) {
+            $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        } else {
+            $directory = $path;
+        }
         if (trim($directory) == $default) {
             $directory = $path;
         }
         $lingo->setWorkingDir($directory);
 
-        if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
-            $stop = 'q';
-            $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
-            while (true) {
-                $lang = $this->ask('Add');
-                if ($lang != $stop) {
-                    $lingo->addLanguage(trim($lang));
-                } else {
-                    break;
-                }  
+        if (!$noAddLang) {
+            if ($this->confirm('Found languages - ' .implode(', ', $lingo->lang). ' -; do you want to add more ?', ['y', 'N'])) {
+                $stop = 'q';
+                $this->info('Write ISO code and press enter to add. Stop this process with writing "'.$stop.'".');
+                while (true) {
+                    $lang = $this->ask('Add');
+                    if ($lang != $stop) {
+                        $lingo->addLanguage(trim($lang));
+                    } else {
+                        break;
+                    }  
+                }
+                $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
             }
-            $this->info('Final languages - '.implode(', ', $lingo->lang).' - ');
+        } else {
+            $this->info('Found languages - ' .implode(', ', $lingo->lang). ' -;'
         }
+
         
         $projects = $lingo->getProjects();
    
@@ -96,14 +108,15 @@ class Push extends Command
         } else {
             $this->info('All files uploaded successfully.');
         }
-        $ignored = $lingo->getIgnoredStrings();
-        if (!empty($ignored)) {
-            if ($this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
-                foreach ($ignored as $key => $value) {
-                    $this->info('In file: '.$value['filePath']. ' language: '.$value['language']. ' string: '.$value['string']. ' was ignored.');
+        if ($showIgnored) {
+            $ignored = $lingo->getIgnoredStrings();
+            if (!empty($ignored)) {
+                if ($this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
+                    foreach ($ignored as $key => $value) {
+                        $this->info('In file: '.$value['filePath']. ' language: '.$value['language']. ' string: '.$value['string']. ' was ignored.');
+                    }
                 }
             }
         }
- 
     }
 }

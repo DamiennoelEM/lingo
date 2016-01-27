@@ -28,9 +28,11 @@ class Pull extends Command
      */
     public function handle()
     {
-        $apiKey     = config('lingohub.apiKey', '');
-        $user       = config('lingohub.username', '');
-        $project    = config('lingohub.project', '');
+        $apiKey             = config('lingohub.apiKey', '');
+        $user               = config('lingohub.username', '');
+        $project            = config('lingohub.project', '');
+        $defaultDir         = config('lingohub.defaultDirectory', false);
+        $getAllLanguages    = config('lingohub.getAllLanguages', false);
 
         if ($apiKey == '') {
             $apiKey = $this->ask('Can\'t find api key in lingohub config, please insert it now.');
@@ -48,7 +50,11 @@ class Pull extends Command
         $path = 'resources/lang/';
         $default = 'd';
 
-        $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        if (!$getAllLanguages) {
+            $directory = $this->ask('Where do you keep your lang files ? (default is: '.$path.', write "'.$default.'" to keep)');
+        } else {
+            $directory = $path;
+        }
         if (trim($directory) == $default) {
             $directory = $path;
         }
@@ -68,8 +74,14 @@ class Pull extends Command
         }
 
         $resources = $lingo->getResources();
+        $localNames = $lingo->getLocalePullNames()
+        if ($getAllLanguages) {
+            $index = array_search('all', $localNames);
+            $projectLocale = $localNames[$index];
+        } else {
+            $projectLocale = $this->choice('Please select locale you wish to import', $localNames);
+        }
         
-        $projectLocale = $this->choice('Please select locale you wish to import', $lingo->getLocalePullNames());
         $lingo->setResource($projectLocale);
 
       
