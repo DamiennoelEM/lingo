@@ -103,20 +103,17 @@ class Push extends Command
             }
             $this->info('Upload status for file - '. $value['file'].': '.$status);
         }
-        
+
         if (!$valid) {
             $this->info('Some files failed to upload, check LingoHub Web Gui for more info.');
         } else {
             $this->info('All files uploaded successfully.');
         }
-
-        if ($showIgnored) {
-            $ignored = $lingo->getIgnoredStrings();
-            if (!empty($ignored)) {
-                if ($this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
-                    foreach ($ignored as $key => $value) {
-                        $this->info('In file: '.$value['filePath']. ' language: '.$value['language']. ' string: '.$value['string']. ' was ignored.');
-                    }
+         $ignored = $lingo->getIgnoredStrings();
+        if (!empty($ignored)) {
+            if ($showIgnored or $this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
+                foreach ($ignored as $key => $value) {
+                    $this->info('In file: '.$value['filePath']. ' language: '.$value['language']. ' string: '.$value['string']. ' was ignored.');
                 }
             }
         }

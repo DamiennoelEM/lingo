@@ -428,7 +428,7 @@ class Lingo
     		}
     		array_push($finalCombine, $newArray);
     	}
-    	var_dump($finalCombine);
+
     	// Calculate path and filename for current csv created
     	$rootCsvDir		= $this->workingDir.'csv-push/';
     	array_push($this->pushDirectories, $rootCsvDir);
