@@ -113,7 +113,7 @@ class Push extends Command
         if (!empty($ignored)) {
             if ($showIgnored or $this->confirm('Some strings were ignored while pushing to LingoHub, do you want to view them ?', ['y', 'N'])) {
                 foreach ($ignored as $key => $value) {
-                    $this->info('In file: *' .$value['filePath']. ' language: *' .$value['language']. '* string: *' .$value['string']. '* was ignored.');
+                    $this->info('In file: *' .$value['filePath']. '* language: *' .$value['language']. '* string: *' .$value['string']. '* was ignored.');
                 }
             }
         }
