@@ -702,7 +702,7 @@ class Lingo
         $filename =  $langFolder.'/'. $file.'.php';
 
         if (file_exists($filename)) {
-        	rename($filename, $filename.'_old');
+        	//rename($filename, $filename.'_old');
         }
 
         $fileCreate = file_put_contents($filename, "<?php\nreturn " . var_export($retval, true) . ';');
