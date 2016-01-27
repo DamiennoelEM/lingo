@@ -74,12 +74,12 @@ class Pull extends Command
         }
 
         $resources = $lingo->getResources();
-        $localNames = $lingo->getLocalePullNames()
+        $localeNames = $lingo->getLocalePullNames();
         if ($getAllLanguages) {
-            $index = array_search('all', $localNames);
-            $projectLocale = $localNames[$index];
+            $index = array_search('all', $localeNames);
+            $projectLocale = $localeNames[$index];
         } else {
-            $projectLocale = $this->choice('Please select locale you wish to import', $localNames);
+            $projectLocale = $this->choice('Please select locale you wish to import', $localeNames);
         }
         
         $lingo->setResource($projectLocale);
