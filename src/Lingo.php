@@ -687,6 +687,7 @@ class Lingo
 			array_push($reader, $data);
 		}
 		ini_set('auto_detect_line_endings', false);
+		fclose($handle);
 
         $index = 2; //  We assume this will be always available
         foreach ($reader as $key=>$row) {
