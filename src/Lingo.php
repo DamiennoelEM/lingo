@@ -694,7 +694,7 @@ class Lingo
             if ($key == 0) {
             	$index = array_search($folder, $row);
             } else {
-            	Arr::set($retval, trim($row[0]), trim($row[$index]);
+            	Arr::set($retval, trim($row[0]), trim($row[$index]));
             }
         }
 
