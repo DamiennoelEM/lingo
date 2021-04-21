@@ -147,7 +147,7 @@ class Lingo
 	 */
 	public function getProjects()
 	{
-		$request = file_get_contents($this->generateBasicLink('projects.json'));
+		$request = file_get_contents($this->generateBasicLink('projects'));
 		$response = json_decode($request, true);
 
        	$this->projects = array_key_exists('members', $response) ? $response['members'] : [];
@@ -540,7 +540,7 @@ class Lingo
                         'iso2_slug'     => $lang );
 
         $ch = curl_init();
-        $options = array(CURLOPT_URL => $this->generateProjectsLink('resources.json'),
+        $options = array(CURLOPT_URL => $this->generateProjectsLink('resources'),
             CURLOPT_RETURNTRANSFER => true,
             CURLINFO_HEADER_OUT => true, 
             CURLOPT_HEADER => true, 
@@ -567,7 +567,7 @@ class Lingo
      */
     public function getResources()
 	{
-		$request = file_get_contents($this->generateProjectsLink('resources.json'));
+		$request = file_get_contents($this->generateProjectsLink('resources'));
 		$response = json_decode($request, true);
 
        	$this->resources = array_key_exists('members', $response) ? $response['members'] : [];
@@ -621,6 +621,7 @@ class Lingo
  	{
  		$retval = [];
  		foreach ($this->pullDataFiles as $file) {
+            sleep(1); // Prevent 429 from lingohub api
  			array_push($retval, $this->fetchFile($file['links']['self']['href'], $file['name']));
  		}
 
